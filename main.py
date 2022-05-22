@@ -12,7 +12,6 @@ menu_message = "Choose what do u want: \n\n"\
                 "3. Look at the trends📈\n"\
                 "4. Check a pickrate of some hero↗"
 
-
 def telegram_bot(token):
     bot = telebot.TeleBot(token)
 
