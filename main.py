@@ -37,80 +37,88 @@ def telegram_bot(token):
             bot.send_message(message.chat.id, menu_message.format(message.from_user),reply_markup=markup)
 
     def itembuild(message):
-        item_build = ''
-        hero = message.text.split()
-        hero = '-'.join(hero).lower()
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0'
-        }
-        url = f'https://ru.dotabuff.com/heroes/{hero.lower()}'
-        try:
-            r = requests.get(url=url, headers=headers)
-            soup = BeautifulSoup(r.text, 'lxml')
-            items = soup.find('div', class_='top-right').find('div', class_='kv').find_all('div', class_='match-item-with-time')
-            for item in items:
-                item_name = item.find('a').get('href').split('/')[-1]
-                try:
-                    timing = item.find('div', class_='time').text
-                except:
-                    timing = 'not given'
-                item_build += f'{item_name}: {timing}\n'
-            item_build = f'{hero.capitalize()}:\n' + item_build
-            bot.send_message(message.chat.id, item_build)
-        except:
-            bot.send_message(message.chat.id, 'Check out ur hero name!!')
+        if message.text == 'Main menu':
+            bot.send_message(message.chat.id, menu_message)
+        else:
+            item_build = ''
+            hero = message.text.split()
+            hero = '-'.join(hero).lower()
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0'
+            }
+            url = f'https://ru.dotabuff.com/heroes/{hero.lower()}'
+            try:
+                r = requests.get(url=url, headers=headers)
+                soup = BeautifulSoup(r.text, 'lxml')
+                items = soup.find('div', class_='top-right').find('div', class_='kv').find_all('div', class_='match-item-with-time')
+                for item in items:
+                    item_name = item.find('a').get('href').split('/')[-1]
+                    try:
+                        timing = item.find('div', class_='time').text
+                    except:
+                        timing = 'not given'
+                    item_build += f'{item_name}: {timing}\n'
+                item_build = f'{hero.capitalize()}:\n' + item_build
+                bot.send_message(message.chat.id, item_build)
+            except:
+                bot.send_message(message.chat.id, 'Check out ur hero name!!')
 
     def trends(message):
-        count = int(message.text)
-        messagee = ''
-        headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0'
-        }
-        try:
-            r = requests.get(url='https://www.dotabuff.com/heroes/trends', headers=headers)
-            soup = BeautifulSoup(r.text, 'lxml')
-            cards = soup.find('table', class_='sortable').find('tbody').find_all('tr')[:count]
-            for card in cards:
-                hero_name = str(card.find('td', class_='cell-centered').get('data-value'))
-                previous_percentage = round(float(card.find_all('td')[1].get('data-value')), 2)
-                current_percentage = round(float(card.find_all('td')[2].get('data-value')), 2)
-                change = round(current_percentage - previous_percentage, 2)
-                messagee += f'Hero name: {hero_name}\nPrevious_percentage: {previous_percentage}\nCurrent_percentage: {current_percentage}\nChange: {change}\n\n'
-            bot.send_message(message.chat.id, f'Here u go!\n{messagee}')
-        except Exception as e:
-            # print(e)
-            bot.send_message(message.chat.id, f'Oooopppss... Ur number is toooooo big, i cant send u THIS count of information😣')
+        if message.text == 'Main menu':
+            bot.send_message(message.chat.id, menu_message)
+        else:
+            count = int(message.text)
+            messagee = ''
+            headers = {
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0'
+            }
+            try:
+                r = requests.get(url='https://www.dotabuff.com/heroes/trends', headers=headers)
+                soup = BeautifulSoup(r.text, 'lxml')
+                cards = soup.find('table', class_='sortable').find('tbody').find_all('tr')[:count]
+                for card in cards:
+                    hero_name = str(card.find('td', class_='cell-centered').get('data-value'))
+                    previous_percentage = round(float(card.find_all('td')[1].get('data-value')), 2)
+                    current_percentage = round(float(card.find_all('td')[2].get('data-value')), 2)
+                    change = round(current_percentage - previous_percentage, 2)
+                    messagee += f'Hero name: {hero_name}\nPrevious_percentage: {previous_percentage}\nCurrent_percentage: {current_percentage}\nChange: {change}\n\n'
+                bot.send_message(message.chat.id, f'Here u go!\n{messagee}')
+            except:
+                bot.send_message(message.chat.id, f'Oooopppss... Ur number is toooooo big, i cant send u THIS count of information😣')
 
     def pickrate_and_winrate(message):
-        hero = message.text.split()
-        hero = '-'.join(hero)
-        j = 1
-        headers = {
-            'Accept': '*/*',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
-        }
-        url = f'https://dotabuff.com/heroes/{hero.lower()}'
-        hero_info = []
-        try:
-            r = requests.get(url=url, headers=headers)
+        if message.text == 'Main menu':
+            bot.send_message(message.chat.id, menu_message)
+        else:
+            hero = message.text.split()
+            hero = '-'.join(hero)
+            j = 1
+            headers = {
+                'Accept': '*/*',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
+            }
+            url = f'https://dotabuff.com/heroes/{hero.lower()}'
+            hero_info = []
+            try:
+                r = requests.get(url=url, headers=headers)
 
-            soup = BeautifulSoup(r.text, 'lxml')
-            container = soup.find('div', class_='col-8')
-            lines_count = container.find_all('section')[0].find('article').find('table').find('tbody').find_all('tr')
-            for i in lines_count:
-                td_list = i.find_all('td')
-                hero_info.append(td_list[0].text)
-                hero_info.append('Pickrate: ' + td_list[1].text)
-                hero_info.append('Winrate: ' + td_list[2].text)
-                j += 1
-            popularity = 'Popularity: ', soup.find('div', class_='header-content-container').find('div', class_='header-content-secondary').find('dl').find('dd').text
+                soup = BeautifulSoup(r.text, 'lxml')
+                container = soup.find('div', class_='col-8')
+                lines_count = container.find_all('section')[0].find('article').find('table').find('tbody').find_all('tr')
+                for i in lines_count:
+                    td_list = i.find_all('td')
+                    hero_info.append(td_list[0].text)
+                    hero_info.append('Pickrate: ' + td_list[1].text)
+                    hero_info.append('Winrate: ' + td_list[2].text)
+                    j += 1
+                popularity = 'Popularity: ', soup.find('div', class_='header-content-container').find('div', class_='header-content-secondary').find('dl').find('dd').text
 
-            hero_info = '\n'.join(hero_info) + '\n' + ''.join(popularity)
-            bot.send_message(message.chat.id, f'Here u go: \n {hero_info}')
+                hero_info = '\n'.join(hero_info) + '\n' + ''.join(popularity)
+                bot.send_message(message.chat.id, f'Here u go: \n {hero_info}')
 
-        except:
-            bot.send_message(message.chat.id, '[!]Oops... Smth went wrong... Check ur hero name[!]')
+            except:
+                bot.send_message(message.chat.id, '[!]Oops... Smth went wrong... Check ur hero name[!]')
 
 
     @bot.message_handler(content_types=["text"])
@@ -139,6 +147,7 @@ def telegram_bot(token):
         elif message.text == '4':
             msg = bot.send_message(message.chat.id, 'Write down hero name:')
             bot.register_next_step_handler(msg, pickrate_and_winrate)
+
         elif message.text == 'Main menu':
             bot.send_message(message.chat.id, menu_message)
 
