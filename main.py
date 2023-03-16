@@ -1,16 +1,25 @@
-from bs4 import BeautifulSoup
+import json
+
 import requests
 import telebot
+from bs4 import BeautifulSoup
 from telebot import types
-from auth_data import token
+
 from best_heroes import heroes, hero_info_bot
+
+with open('config.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
+
+TOKEN = data.get('TOKEN')
+
 heroes_list = []
 hero_info_bot = ''.join(hero_info_bot)
-menu_message = "Choose what do u want: \n\n"\
-                "1. See who in the top by winrate now🔝\n"\
-                "2. Get a itembuild of some hero👊\n"\
-                "3. Look at the trends📈\n"\
-                "4. Check a pickrate of some hero↗"
+menu_message = "Choose what do u want: \n\n" \
+               "1. See who in the top by winrate now🔝\n" \
+               "2. Get a itembuild of some hero👊\n" \
+               "3. Look at the trends📈\n" \
+               "4. Check a pickrate of some hero↗"
+
 
 def telegram_bot(token):
     bot = telebot.TeleBot(token)
@@ -28,13 +37,14 @@ def telegram_bot(token):
         if message.text == '/start':
             bot.send_message(message.chat.id, "Hello friend! I am simple, not official dotabuff bot. \n"
                                               "With me u can get some info from Dotabuff.com! \n"
-                                             "Choose what do u want: \n\n"
+                                              "Choose what do u want: \n\n"
                                               "1. See who in the top by winrate now🔝\n"
                                               "2. Get a itembuild of some hero👊\n"
                                               "3. Look at the trends📈\n"
-                                              "4. Check a pickrate of some hero↗".format(message.from_user), reply_markup=markup)
+                                              "4. Check a pickrate of some hero↗".format(message.from_user),
+                             reply_markup=markup)
         elif message.text == '/menu':
-            bot.send_message(message.chat.id, menu_message.format(message.from_user),reply_markup=markup)
+            bot.send_message(message.chat.id, menu_message.format(message.from_user), reply_markup=markup)
 
     def itembuild(message):
         if message.text == 'Main menu':
@@ -50,7 +60,8 @@ def telegram_bot(token):
             try:
                 r = requests.get(url=url, headers=headers)
                 soup = BeautifulSoup(r.text, 'lxml')
-                items = soup.find('div', class_='top-right').find('div', class_='kv').find_all('div', class_='match-item-with-time')
+                items = soup.find('div', class_='top-right').find('div', class_='kv').find_all('div',
+                                                                                               class_='match-item-with-time')
                 for item in items:
                     item_name = item.find('a').get('href').split('/')[-1]
                     try:
@@ -85,7 +96,8 @@ def telegram_bot(token):
                     messagee += f'Hero name: {hero_name}\nPrevious_percentage: {previous_percentage}\nCurrent_percentage: {current_percentage}\nChange: {change}\n\n'
                 bot.send_message(message.chat.id, f'Here u go!\n{messagee}')
             except:
-                bot.send_message(message.chat.id, f'Oooopppss... Ur number is toooooo big, i cant send u THIS count of information😣')
+                bot.send_message(message.chat.id,
+                                 f'Oooopppss... Ur number is toooooo big, i cant send u THIS count of information😣')
 
     def pickrate_and_winrate(message):
         if message.text == 'Main menu':
@@ -105,21 +117,23 @@ def telegram_bot(token):
 
                 soup = BeautifulSoup(r.text, 'lxml')
                 container = soup.find('div', class_='col-8')
-                lines_count = container.find_all('section')[0].find('article').find('table').find('tbody').find_all('tr')
+                lines_count = container.find_all('section')[0].find('article').find('table').find('tbody').find_all(
+                    'tr')
                 for i in lines_count:
                     td_list = i.find_all('td')
                     hero_info.append(td_list[0].text)
                     hero_info.append('Pickrate: ' + td_list[1].text)
                     hero_info.append('Winrate: ' + td_list[2].text)
                     j += 1
-                popularity = 'Popularity: ', soup.find('div', class_='header-content-container').find('div', class_='header-content-secondary').find('dl').find('dd').text
+                popularity = 'Popularity: ', soup.find('div', class_='header-content-container').find('div',
+                                                                                                      class_='header-content-secondary').find(
+                    'dl').find('dd').text
 
                 hero_info = '\n'.join(hero_info) + '\n' + ''.join(popularity)
                 bot.send_message(message.chat.id, f'Here u go: \n {hero_info}')
 
             except:
                 bot.send_message(message.chat.id, '[!]Oops... Smth went wrong... Check ur hero name[!]')
-
 
     @bot.message_handler(content_types=["text"])
     def hero_info_func(message):
@@ -151,10 +165,8 @@ def telegram_bot(token):
         elif message.text == 'Main menu':
             bot.send_message(message.chat.id, menu_message)
 
-    bot.polling()
+    bot.infinity_polling()
 
 
 if __name__ == '__main__':
-    telegram_bot(token)
-
-# Access
+    telegram_bot(TOKEN)

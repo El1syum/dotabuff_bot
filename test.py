@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-
 item_build = ''
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0'
@@ -17,5 +16,5 @@ for item in items:
     except:
         timing = 'not given'
     item_build += f'{item_name}: {timing}\n'
-item_build = 'dasdas\n'+item_build
+item_build = 'dasdas\n' + item_build
 print(item_build)

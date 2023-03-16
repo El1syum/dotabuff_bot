@@ -1,5 +1,6 @@
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
+
 heroes = []
 item_list = []
 hero_info_bot = []
@@ -41,14 +42,15 @@ def get_hero_info():
         url = f'https://ru.dotabuff.com/heroes/{hero.lower()}'
         r = requests.get(url=url, headers=headers)
         soup = BeautifulSoup(r.text, 'lxml')
-        items = soup.find('div', class_='top-right').find('div', class_='kv').find_all('div', class_='match-item-with-time')
+        items = soup.find('div', class_='top-right').find('div', class_='kv').find_all('div',
+                                                                                       class_='match-item-with-time')
         for item in items:
             item_name = item.find('a').get('href').split('/')[-1]
             try:
                 timing = item.find('div', class_='time').text
             except:
                 timing = 'not given'
-            item_list += [ hero, f'{item_name}: {timing}']
+            item_list += [hero, f'{item_name}: {timing}']
         # item_list += ['|']
 
     for first, second in zip(item_list, item_list[1:]):
@@ -61,9 +63,9 @@ def get_hero_info():
             continue
         else:
             hero_info_bot.append(second)
-    for hero in range(len(hero_info_bot)*2):
+    for hero in range(len(hero_info_bot) * 2):
         if hero_info_bot[hero] != '\n':
-            hero_info_bot.insert(hero+1, '\n')
+            hero_info_bot.insert(hero + 1, '\n')
         else:
             continue
 
