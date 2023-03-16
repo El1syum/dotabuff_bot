@@ -1,4 +1,6 @@
 import json
+import logging
+import os.path
 
 import requests
 import telebot
@@ -7,10 +9,15 @@ from telebot import types
 
 from best_heroes import heroes, hero_info_bot
 
+if not os.path.exists('logs/'):
+    os.mkdir('logs')
+
 with open('config.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
 
 TOKEN = data.get('TOKEN')
+
+logging.basicConfig(filename='logs/bot.log', level=logging.INFO, encoding='utf-8')
 
 heroes_list = []
 hero_info_bot = ''.join(hero_info_bot)
@@ -50,6 +57,7 @@ def telegram_bot(token):
         if message.text == 'Main menu':
             bot.send_message(message.chat.id, menu_message)
         else:
+            logging.info(message)
             item_build = ''
             hero = message.text.split()
             hero = '-'.join(hero).lower()
@@ -71,13 +79,15 @@ def telegram_bot(token):
                     item_build += f'{item_name}: {timing}\n'
                 item_build = f'{hero.capitalize()}:\n' + item_build
                 bot.send_message(message.chat.id, item_build)
-            except:
+            except Exception as e:
+                logging.error(f'ITEMBUILD FUNC ERROR\n{e}')
                 bot.send_message(message.chat.id, 'Check out ur hero name!!')
 
     def trends(message):
         if message.text == 'Main menu':
             bot.send_message(message.chat.id, menu_message)
         else:
+            logging.info(message)
             count = int(message.text)
             messagee = ''
             headers = {
@@ -95,7 +105,8 @@ def telegram_bot(token):
                     change = round(current_percentage - previous_percentage, 2)
                     messagee += f'Hero name: {hero_name}\nPrevious_percentage: {previous_percentage}\nCurrent_percentage: {current_percentage}\nChange: {change}\n\n'
                 bot.send_message(message.chat.id, f'Here u go!\n{messagee}')
-            except:
+            except Exception as e:
+                logging.error(f'TRENDS FUNC ERROR\n{e}')
                 bot.send_message(message.chat.id,
                                  f'Oooopppss... Ur number is toooooo big, i cant send u THIS count of information😣')
 
@@ -103,6 +114,7 @@ def telegram_bot(token):
         if message.text == 'Main menu':
             bot.send_message(message.chat.id, menu_message)
         else:
+            logging.info(message)
             hero = message.text.split()
             hero = '-'.join(hero)
             j = 1
@@ -132,11 +144,14 @@ def telegram_bot(token):
                 hero_info = '\n'.join(hero_info) + '\n' + ''.join(popularity)
                 bot.send_message(message.chat.id, f'Here u go: \n {hero_info}')
 
-            except:
+            except Exception as e:
+                logging.error(f'PICKRATE_AND_WINRATE FUNC ERROR\n{e}')
                 bot.send_message(message.chat.id, '[!]Oops... Smth went wrong... Check ur hero name[!]')
 
     @bot.message_handler(content_types=["text"])
     def hero_info_func(message):
+        logging.info(message)
+
         if message.text == '1':
             for h in heroes:
                 hero_name = h.get('Name').split()

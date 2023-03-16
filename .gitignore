@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 config.json
+logs/
 
 # C extensions
 *.so
